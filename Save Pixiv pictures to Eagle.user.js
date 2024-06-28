@@ -32,6 +32,7 @@ const PATT = / *[@＠◆■◇☆⭐️🌟🦇💎🔞🍅🌱🐻🍬：:\\\/]
 const SAVE_TAGS = true; // 是否保存标签
 const TAG_AUTHOR = true; // 是否将作者名加入标签
 const TAG_TRANSLATION = 2; // 标签翻译处理方式，0：仅加入原标签；1：仅加入翻译标签；2：均加入标签
+const SET_MODIFICATION_TIME = false; // 以圖片投稿時間作為Eagle匯入時的「加入日期」
 const ADD_TO_FAVOR = true; // 下载时是否同时加入收藏
 const DL_Multiple = true; // 通过缩略图下载时，下载多P
 const CREATE_SUBFOLDER = false; // 多图时创建子文件夹
@@ -47,6 +48,7 @@ var patt = new RegExp(GM_getValue("patt", PATT.source));
 var saveTags = GM_getValue("saveTags", SAVE_TAGS);
 var tagAuthor = GM_getValue("tagAuthor", TAG_AUTHOR);
 var tagTranslation = GM_getValue("tagTranslation", TAG_TRANSLATION);
+var setModificationTime = GM_getValue("setModificationTime", SET_MODIFICATION_TIME);
 var addToFavor = GM_getValue("addToFavor", ADD_TO_FAVOR);
 var DLMultiple = GM_getValue("DLMultiple", DL_Multiple);
 var createSubfolder = GM_getValue("createSubfolder", CREATE_SUBFOLDER);
@@ -95,6 +97,7 @@ const PIC_END = ".gtm-illust-work-scroll-finish-reading" // 展开多图时结�
 const UGO_SRC = ".sc-tu09d3-1"; // 动图
 const TAG_SELECTOR = ".sc-pj1a4x-1"; // 标签和标签翻译
 const AUTHOR = ".sc-10gpz4q-6"; // 作者
+const POST_DATETIME = ".sc-5981ly-1"; // 發布時間
 
 const HEADERS = {
     "referer": "https://www.pixiv.net/",
@@ -527,13 +530,14 @@ const sleep = (delay) => {return new Promise((resolve) => {return setTimeout(res
                     alert("下载失败！");
                     return;
                 }
-                let [name, annotation, tags, author, id] = getCommonInfo();
+                let [name, annotation, tags, author, id, modificationTime] = getCommonInfo();
                 let data = {
                     "url": image.href,
                     "name": name,
                     "website": document.URL,
                     "tags": tags,
                     "annotation": annotation,
+                    "modificationTime": modificationTime,
                     "headers": HEADERS
                 }
                 return [data, author, id];
@@ -573,7 +577,7 @@ const sleep = (delay) => {return new Promise((resolve) => {return setTimeout(res
                     return [null, null];
                 }
                 let data = {"items":[]};
-                let [name, annotation, tags, author, id] = getCommonInfo();
+                let [name, annotation, tags, author, id, modificationTime] = getCommonInfo();
                 images.each((index, url) => {
                     if(url === undefined) return;
                     data.items.push({
@@ -582,6 +586,7 @@ const sleep = (delay) => {return new Promise((resolve) => {return setTimeout(res
                         "website": document.URL,
                         "annotation": annotation,
                         "tags": tags,
+                        "modificationTime": modificationTime,
                         "headers": HEADERS
                     });
                     index++;
@@ -591,7 +596,7 @@ const sleep = (delay) => {return new Promise((resolve) => {return setTimeout(res
 
             function getSelectData(){
                 let checkbox = $(".to_eagle");
-                let [name, annotation, tags, author, id] = getCommonInfo();
+                let [name, annotation, tags, author, id, modificationTime] = getCommonInfo();
                 let data = {"items":[]};
                 checkbox.each((index, element)=>{
                     if(element.checked === true){
@@ -601,6 +606,7 @@ const sleep = (delay) => {return new Promise((resolve) => {return setTimeout(res
                             "website": document.URL,
                             "annotation": annotation,
                             "tags": tags,
+                            "modificationTime": modificationTime,
                             "headers": HEADERS
                         })
                     }
@@ -1119,7 +1125,13 @@ const sleep = (delay) => {return new Promise((resolve) => {return setTimeout(res
         if(tagAuthor){
             tags.push(author);
         }
-        return [name, annotation, tags, author, id];
+
+        let modificationTime = null;
+        if(setModificationTime){
+            modificationTime = Date.parse($('.sc-5981ly-1').attr('datetime'));
+        }
+
+        return [name, annotation, tags, author, id, modificationTime];
     }
 
     function createCommonButton(text){
@@ -1553,6 +1565,7 @@ function createConfigPage(){
     // 布尔值
     let saveTags_input = createNewConfig("是否保存标签", "checkbox", saveTags);
     let tagAuthor_input = createNewConfig("是否将作者名加入标签", "checkbox", tagAuthor);
+    let setModificationTime_input = createNewConfig("是否将圖片投稿時間作為Eagle匯入時的「加入日期」", "checkbox", setModificationTime);
     let addToFavor_input = createNewConfig("下载时是否同时加入收藏", "checkbox", addToFavor);
     let useCheckbox_input = createNewConfig("使用复选框，而不是每张图添加下载按键", "checkbox", useCheckbox);
     let DLMultiple_input = createNewConfig("批量下载时，下载多P", "checkbox", DLMultiple);
@@ -1576,6 +1589,7 @@ function createConfigPage(){
     button_save.addEventListener("click", ()=>{
         saveTags = saveTags_input.checked;
         tagAuthor = tagAuthor_input.checked;
+        setModificationTime = setModificationTime_input.checked;
         addToFavor = addToFavor_input.checked;
         useCheckbox = useCheckbox_input.checked;
         DLMultiple = DLMultiple_input.checked;
@@ -1590,6 +1604,7 @@ function createConfigPage(){
         GM_setValue("saveTags", saveTags);
         GM_setValue("tagAuthor", tagAuthor);
         GM_setValue("tagTranslation", tagTranslation);
+        GM_setValue("setModificationTime", setModificationTime);
         GM_setValue("addToFavor", addToFavor);
         GM_setValue("searchDirName", searchDirName);
         GM_setValue("searchDirId", searchDirId);
