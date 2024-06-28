@@ -1308,6 +1308,11 @@ const sleep = (delay) => {return new Promise((resolve) => {return setTimeout(res
                             console.log("获取用户id失败！")
                             console.log(illustData);
                         }
+                        let modificationTime = null;
+                        if(setModificationTime){
+                            modificationTime = Date.parse(illustData.createDate);
+                        }
+                        item.modificationTime = modificationTime;
                         resolve({item, author, authorId});
                     }
                     catch(e){
@@ -1360,6 +1365,11 @@ const sleep = (delay) => {return new Promise((resolve) => {return setTimeout(res
                             console.log("获取用户id失败！")
                             console.log(illustData);
                         }
+                        let modificationTime = null;
+                        if(setModificationTime){
+                            modificationTime = Date.parse(illustData.createDate);
+                        }
+                        item.modificationTime = modificationTime;
                         items.push({item, author, authorId});
                         let url0 = item.url.replace(/0\.[a-z]+/, "");
                         let suffix = item.url.match(/(?<=0)\.[a-z]+/);
@@ -1370,6 +1380,7 @@ const sleep = (delay) => {return new Promise((resolve) => {return setTimeout(res
                                 "name": items[0].item.name,
                                 "annotation": items[0].item.annotation,
                                 "tags": items[0].item.tags,
+                                "modificationTime": items[0].item.modificationTime,
                                 "headers": items[0].item.headers
                             };
                             items.push({item, author, authorId});
