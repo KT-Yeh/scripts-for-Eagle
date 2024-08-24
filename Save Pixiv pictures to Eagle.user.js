@@ -1179,6 +1179,10 @@ const sleep = (delay) => {return new Promise((resolve) => {return setTimeout(res
                         downloadList();
                     }
                     e.checked = false;
+                    let btnMyFavorite = e.parentElement.parentElement.querySelector('button');
+                    if (addToFavor && btnMyFavorite){
+                        btnMyFavorite.click();
+                    }
                 }
                 else if(--count === 0){
                     downloadList();
