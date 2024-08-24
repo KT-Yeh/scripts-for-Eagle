@@ -71,7 +71,7 @@ const create_child_folder = 20210806; // 支持创建子文件夹的版本build�
 // 各种页面元素JQuery选择器
 const PAGE_SELECTOR = "div[type=illust] .sc-rp5asc-0"; // Pixiv首页及用户页图片选择器
 const BUTTON_SELECTOR = ".sc-7zddlj-1"; // 使用添加选择框的方式时的下载按钮位置
-const NEW_ILLUST_BUTTON = ".sc-192ftwf-0"; // 新作品页按键位置
+const NEW_ILLUST_BUTTON = ".sc-s8zj3z-2"; // 新作品页按键位置
 const RANK_PAGE_BUTTON = "nav.column-menu"; // 排行榜按键位置
 const DL_ILLUST_BUTTON = ".sc-iasfms-2"; // 不使用复选框时，下载单张图片的按键位置
 const SHOW_ALL = "a.sc-d98f2c-0.sc-s46o24-1" // 用户页面显示全部图片的按键位置
@@ -416,6 +416,7 @@ const sleep = (delay) => {return new Promise((resolve) => {return setTimeout(res
             }
         })
         let dl_page_between = createMultiPageButton();
+        newPageCommon();
         $(NEW_ILLUST_BUTTON).append(dl_page_between);
     }
 
@@ -467,6 +468,7 @@ const sleep = (delay) => {return new Promise((resolve) => {return setTimeout(res
         });
         $(BUTTON_SELECTOR, section).append(button);
         let dl_page_between = createMultiPageButton();
+        newPageCommon();
         $(BUTTON_SELECTOR, section).append(dl_page_between);
     }
 
